@@ -82,34 +82,13 @@ class Wordle {
     const collection = db.collection('dictionary');
 
     const w = new Wordle();
-    w.pushRow([
-      { letter: 'e', color: COLOR.YELLOW },
-      { letter: 'v', color: COLOR.GRAY },
-      { letter: 'o', color: COLOR.GRAY },
-      { letter: 'k', color: COLOR.GRAY },
-      { letter: 'e', color: COLOR.YELLOW }
-    ]);
-    w.pushRow([
-      { letter: 's', color: COLOR.GRAY },
-      { letter: 'a', color: COLOR.YELLOW },
-      { letter: 'n', color: COLOR.GRAY },
-      { letter: 'e', color: COLOR.YELLOW },
-      { letter: 'r', color: COLOR.GRAY }
-    ]);
-    w.pushRow([
-      { letter: 'm', color: COLOR.GRAY },
-      { letter: 'e', color: COLOR.YELLOW },
-      { letter: 'a', color: COLOR.YELLOW },
-      { letter: 't', color: COLOR.GRAY },
-      { letter: 'y', color: COLOR.GRAY }
-    ]);
-    w.pushRow([
-      { letter: 'p', color: COLOR.GRAY },
-      { letter: 'l', color: COLOR.GRAY },
-      { letter: 'e', color: COLOR.GREEN },
-      { letter: 'a', color: COLOR.GREEN },
-      { letter: 'd', color: COLOR.GREEN }
-    ]);
+    // w.pushRow([
+    //   { letter: 's', color: COLOR.GRAY },
+    //   { letter: 'p', color: COLOR.GRAY },
+    //   { letter: 'i', color: COLOR.GRAY },
+    //   { letter: 'k', color: COLOR.GRAY },
+    //   { letter: 'y', color: COLOR.GRAY }
+    // ]);
 
     const cursor = collection.aggregate(w.agg());
     while (await cursor.hasNext()) {

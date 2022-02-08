@@ -1,0 +1,8 @@
+{
+    "app_id": "wordle-gvqgy",
+    "config_version": 20210101,
+    "name": "Wordle",
+    "location": "US-VA",
+    "deployment_model": "LOCAL",
+    "environment": "production"
+}
