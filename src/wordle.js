@@ -1,4 +1,12 @@
 export default class Wordle {
+  
+  static COLOR = {
+    GRAY: 0,
+    YELLOW: 1,
+    GREEN: 2,
+    UNDEFINED: -1
+  };
+
   constructor () {
     this.schema = [];
   }
