@@ -1,5 +1,7 @@
 {
     "enabled": true,
+    "custom_domain": "wordler.tinythings.co",
     "app_default_domain": "wordle-gvqgy.mongodbstitch.com",
-    "custom_domain": "wordler.tinythings.co"
+    "default_error_path": "",
+    "default_error_code": ""
 }
