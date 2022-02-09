@@ -1,8 +1,11 @@
 <script>
 	import Letter from './Letter.svelte';
 	import Wordle from './wordle';
+	import * as Realm from "realm-web";
 	
 	const w = new Wordle();
+	const app = new Realm.App({ id: 'wordle-gvqgy' });
+	const credentials = Realm.Credentials.anonymous();
 
 	let words = [
 		[{letter: 'h'}, {letter: 'e'}, {letter: 'l'}, {letter: 'l'}, {letter: 'o'}]
@@ -39,16 +42,20 @@
 </svelte:head>
 
 <main>
-	{#each words as word, i}
-		<div class="entry">
-			<div class="word">
-				{#each word.map(({letter}) => letter) as l, position}
-					<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
-				{/each}
+	{#await app.logIn(credentials)}
+		<p>Setting things up...</p>
+	{:then user} 
+		{#each words as word, i}
+			<div class="entry">
+				<div class="word">
+					{#each word.map(({letter}) => letter) as l, position}
+						<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
+					{/each}
+				</div>
+				<button class="next" on:click={nextWord} disabled={nextDisabled}>Next Word</button>
 			</div>
-			<button class="next" on:click={nextWord} disabled={nextDisabled}>Next Word</button>
-		</div>
-	{/each}
+		{/each}
+	{/await}
 </main>
 
 <style>
