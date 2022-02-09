@@ -5,6 +5,7 @@
 	
 	const w = new Wordle();
 	const app = new Realm.App({ id: 'wordle-gvqgy' });
+	const credentials = Realm.Credentials.anonymous();
 
 	let words = [];
 	let nextDisabled = true;
@@ -22,6 +23,9 @@
 	async function getNextWord() {
 		if(words.length > 0) {
 			w.pushRow(words[words.length - 1]);
+		}
+		if(!app.currentUser) {
+			await app.logIn(credentials);
 		}
 		const agg = w.agg();
 		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
