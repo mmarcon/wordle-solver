@@ -62,7 +62,7 @@
   }
 
   .color-selector button:disabled {
-    display: none;
+    opacity: 0.3;
   }
 
   .color-selector .absent{

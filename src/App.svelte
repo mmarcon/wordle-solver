@@ -7,20 +7,8 @@
 	const app = new Realm.App({ id: 'wordle-gvqgy' });
 	const credentials = Realm.Credentials.anonymous();
 
-	let words = [
-		[{letter: 'h'}, {letter: 'e'}, {letter: 'l'}, {letter: 'l'}, {letter: 'o'}]
-	];
-	let candidateWords = [
-		[{letter: 'w'}, {letter: 'o'}, {letter: 'r'}, {letter: 'l'}, {letter: 'd'}],
-		[{letter: 'f'}, {letter: 'o'}, {letter: 'o'}, {letter: 'l'}, {letter: 's'}]
-	];
+	let words = [];
 	let nextDisabled = true;
-
-	function nextWord() {
-		w.pushRow(words[words.length - 1]);
-		console.log(w.agg());
-		words = [...words, candidateWords.shift()];
-	}
 
 	function colorChanged(position, color) {
 		words[words.length - 1][position].color = Wordle.COLOR[color];
@@ -28,7 +16,20 @@
 	}
 
 	function nextEnabled() {
-		return words[words.length - 1].filter(l => l.color === undefined).length === 0;
+		return words[words.length - 1].filter(l => l.color === undefined).length === 0 &&
+			words[words.length - 1].filter(l => l.color === Wordle.COLOR.correct).length < 5
+	}
+
+	async function getNextWord() {
+		if(words.length > 0) {
+			w.pushRow(words[words.length - 1]);
+		}
+		const agg = w.agg();
+		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
+		const dictionary = mongodb.db('wordle_solver').collection('dictionary');
+		const [{word}] = await dictionary.aggregate(agg);
+		words = [...words, word.split('').map(letter => ({letter}))];
+		return words;
 	}
 </script>
 
@@ -42,9 +43,9 @@
 </svelte:head>
 
 <main>
-	{#await app.logIn(credentials)}
-		<p>Setting things up...</p>
-	{:then user} 
+	{#await getNextWord()}
+		<p class="loader">Setting things up...</p>
+	{:then _} 
 		{#each words as word, i}
 			<div class="entry">
 				<div class="word">
@@ -52,13 +53,22 @@
 						<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 					{/each}
 				</div>
-				<button class="next" on:click={nextWord} disabled={nextDisabled}>Next Word</button>
+				<button class="next" on:click={getNextWord} disabled={nextDisabled}>Next Word</button>
 			</div>
 		{/each}
 	{/await}
 </main>
 
 <style>
+	.loader {
+		margin-top: 10px;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		color: #d7dadc;
+		font-weight: 600;
+		font-size: 22px;
+	}
 	.entry {
 		margin-top: 10px;
 		display: flex;
