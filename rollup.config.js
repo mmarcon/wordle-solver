@@ -34,7 +34,7 @@ export default {
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
-		file: 'realm-app/hosting/files/bundle.js'
+		file: 'realm-app/hosting/files/build/bundle.js'
 	},
 	plugins: [
 		svelte({

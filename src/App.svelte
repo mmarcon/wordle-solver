@@ -5,7 +5,6 @@
 	
 	const w = new Wordle();
 	const app = new Realm.App({ id: 'wordle-gvqgy' });
-	const credentials = Realm.Credentials.anonymous();
 
 	let words = [];
 	let nextDisabled = true;
