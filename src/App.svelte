@@ -4,16 +4,33 @@
 	
 	const w = new Wordle();
 
-	let words = ['world'];
-	let candidateWords = ['float', 'prime', 'cross'];
+	let words = [
+		[{letter: 'h'}, {letter: 'e'}, {letter: 'l'}, {letter: 'l'}, {letter: 'o'}]
+	];
+	let candidateWords = [
+		[{letter: 'w'}, {letter: 'o'}, {letter: 'r'}, {letter: 'l'}, {letter: 'd'}],
+		[{letter: 'f'}, {letter: 'o'}, {letter: 'o'}, {letter: 'l'}, {letter: 's'}]
+	];
+	let nextDisabled = true;
 
 	function nextWord() {
+		w.pushRow(words[words.length - 1]);
+		console.log(w.agg());
 		words = [...words, candidateWords.shift()];
+	}
+
+	function colorChanged(position, color) {
+		words[words.length - 1][position].color = Wordle.COLOR[color];
+		nextDisabled = !nextEnabled();
+	}
+
+	function nextEnabled() {
+		return words[words.length - 1].filter(l => l.color === undefined).length === 0;
 	}
 </script>
 
 <svelte:head>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	
 	<style>
 		body {
 			background-color: #121213;
@@ -25,11 +42,11 @@
 	{#each words as word, i}
 		<div class="entry">
 			<div class="word">
-				{#each word.split('') as l}
-					<Letter letter="{l}" color="" frozen={i < words.length - 1}></Letter>
+				{#each word.map(({letter}) => letter) as l, position}
+					<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 				{/each}
 			</div>
-			<button class="next" on:click={nextWord}>Next Word</button>
+			<button class="next" on:click={nextWord} disabled={nextDisabled}>Next Word</button>
 		</div>
 	{/each}
 </main>
@@ -42,7 +59,6 @@
 		justify-content: center;
 	}
 	.word {
-		background-color: #121213;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -61,8 +77,13 @@
 		margin: 0 0 0 5px;
 		visibility: hidden;
 		border-radius: 10px;
+		cursor: pointer;
 	}
 	.entry:last-child .next {
 		visibility: visible;
+	}
+	.next:disabled {
+		opacity: 0.5;
+		cursor: default;
 	}
 </style>

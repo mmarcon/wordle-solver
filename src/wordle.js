@@ -1,11 +1,32 @@
 export default class Wordle {
   
   static COLOR = {
-    GRAY: 0,
-    YELLOW: 1,
-    GREEN: 2,
-    UNDEFINED: -1
+    absent: 0,
+    present: 1,
+    correct: 2,
+    undefined: -1
   };
+
+  static AGG_WITH_REGEX = (regex) => [{
+    $search: {
+      index: 'wordle_dictionary',
+      regex: {
+        query: regex,
+        path: 'word',
+        allowAnalyzedField: true
+      }
+    }
+  }, {
+    $sample: {
+      size: 1
+    }
+  }];
+
+  static BASE_AGG = [{
+    $sample: {
+      size: 1
+    }
+  }];
 
   constructor () {
     this.schema = [];
@@ -13,21 +34,21 @@ export default class Wordle {
 
   agg () {
     if (this.schema.length === 0) {
-      return BASE_AGG;
+      return Wordle.BASE_AGG;
     }
     const regexes = [{ in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }];
     const and = [];
     for (let col = 0; col < 5; col++) {
       for (const row of this.schema) {
         switch (row[col].color) {
-          case COLOR.GRAY:
+          case Wordle.COLOR.absent:
             regexes.forEach(r => { r.out += row[col].letter; });
             break;
-          case COLOR.YELLOW:
+          case Wordle.COLOR.present:
             regexes[col].out += row[col].letter;
             and.push(row[col].letter);
             break;
-          case COLOR.GREEN:
+          case Wordle.COLOR.correct:
             regexes[col].in = row[col].letter;
             break;
         }
@@ -39,7 +60,7 @@ export default class Wordle {
       regex += '&';
     }
     regex += regexes.map(r => r.in ? r.in : `[^${r.out}]`).join('');
-    return AGG_WITH_REGEX(regex);
+    return Wordle.AGG_WITH_REGEX(regex);
   }
 
   pushRow (sequence) {

@@ -1,8 +1,12 @@
 <script>
-	export let color, letter, frozen;
+	import { createEventDispatcher } from 'svelte';
+  export let color, letter, frozen;
+
+  const dispatch = createEventDispatcher();
 
   function setColor(theColor) {
-    color = theColor
+    color = theColor;
+    dispatch('colorchange', {color: theColor})
   }
 </script>
 
@@ -54,6 +58,7 @@
     border-radius: 50%;
     margin: 0;
     padding: 0;
+    cursor: pointer;
   }
 
   .color-selector button:disabled {
