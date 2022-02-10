@@ -9,6 +9,7 @@
 
 	let words = [];
 	let nextDisabled = true;
+	let noword = false;
 
 	function colorChanged(position, color) {
 		words[words.length - 1][position].color = Wordle.COLOR[color];
@@ -30,20 +31,15 @@
 		const agg = w.agg();
 		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
 		const dictionary = mongodb.db('wordle_solver').collection('dictionary');
-		const [{word}] = await dictionary.aggregate(agg);
-		words = [...words, word.split('').map(letter => ({letter}))];
-		return words;
+		try {
+			const [{word}] = await dictionary.aggregate(agg);
+			words = [...words, word.split('').map(letter => ({letter}))];
+			return words;
+		} catch {
+			noword = true;
+		}
 	}
 </script>
-
-<svelte:head>
-	
-	<style>
-		body {
-			background-color: #121213;
-		}
-	</style>
-</svelte:head>
 
 <main>
 	{#await getNextWord()}
@@ -56,13 +52,20 @@
 						<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 					{/each}
 				</div>
-				<button class="next" on:click={getNextWord} disabled={nextDisabled}>Next Word</button>
+				<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
 			</div>
 		{/each}
 	{/await}
+	{#if noword}
+		<p class="noword">No matching words found</p>
+	{/if}
 </main>
 
 <style>
+	:global(body) {
+		background-color: #121213;
+	}
+
 	.loader {
 		margin-top: 10px;
 		display: flex;
@@ -77,6 +80,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
+		flex-wrap: wrap;
 	}
 	.word {
 		display: flex;
@@ -99,11 +103,36 @@
 		border-radius: 10px;
 		cursor: pointer;
 	}
-	.entry:last-child .next {
-		visibility: visible;
-	}
 	.next:disabled {
 		opacity: 0.5;
 		cursor: default;
+	}
+
+	.noword {
+		margin-top: 10px;
+		display: flex;
+		align-items: flex-end;
+		justify-content: center;
+		color: #e9667b;
+		font-weight: 600;
+		font-size: 22px;
+		text-transform: uppercase;
+	}
+
+	@media only screen and (max-width: 768px) {
+		.entry {
+			margin-top: 0;
+		}
+		.next {
+			font-size: 16px;
+			line-height: 30px;
+			margin-top: 8px;
+			display: none;
+		}
+	}
+
+	.entry:last-child .next {
+		display: block;
+		visibility: visible;
 	}
 </style>

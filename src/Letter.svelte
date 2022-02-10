@@ -29,7 +29,7 @@
     --color-undefined: transparent;
     display: inline-flex;
     flex-direction: column;
-    margin: 0 8px;
+    margin: 0 3px;
     align-items: center;
   }
   .letter {
@@ -52,11 +52,15 @@
     text-transform: uppercase;
 	}
 
+  .color-selector {
+    display: flex;
+  }
+
   .color-selector button {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    margin: 0;
+    margin: 0 3px;
     padding: 0;
     cursor: pointer;
   }
@@ -64,6 +68,25 @@
   .color-selector button:disabled {
     opacity: 0.3;
   }
+
+  @media only screen and (max-width: 768px) {
+    .color-selector {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .color-selector button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin: 3px 0;
+    }
+
+    .color-selector button:disabled {
+      display: none;
+    }
+  }
+
 
   .color-selector .absent{
     background-color: var(--color-absent);
