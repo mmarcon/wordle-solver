@@ -28,12 +28,18 @@
 		if(!app.currentUser) {
 			await app.logIn(credentials);
 		}
+		const placeholder = words.length > 0 ? 
+			words[words.length - 1].map(l => l.color === Wordle.COLOR.correct ? l : {letter: '?'}) :
+			[{letter: '?'}, {letter: '?'}, {letter: '?'}, {letter: '?'}, {letter: '?'}];
+		words = [...words, placeholder];
 		const agg = w.agg();
+		console.log(agg);
 		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
 		const dictionary = mongodb.db('wordle_solver').collection('dictionary');
 		try {
 			const [{word}] = await dictionary.aggregate(agg);
-			words = [...words, word.split('').map(letter => ({letter}))];
+			words.pop();
+			words = [...words, word.split('').map((letter, p) => ({letter, color: placeholder[p].color}))];
 			return words;
 		} catch {
 			noword = true;
@@ -48,8 +54,8 @@
 		{#each words as word, i}
 			<div class="entry">
 				<div class="word">
-					{#each word.map(({letter}) => letter) as l, position}
-						<Letter letter="{l}" color="" frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
+					{#each word as l, position}
+						<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 					{/each}
 				</div>
 				<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>

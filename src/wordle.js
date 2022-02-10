@@ -28,6 +28,14 @@ export default class Wordle {
     }
   }];
 
+  static color(colorCode) {
+    for (const [k, v] of Object.entries(Wordle.COLOR)) {
+      if (colorCode === v) {
+        return k;
+      }
+    }
+  }
+
   constructor () {
     this.schema = [];
   }
