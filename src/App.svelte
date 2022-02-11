@@ -1,5 +1,6 @@
 <script>
 	import Letter from './Letter.svelte';
+	import Definition from './Definition.svelte';
 	import Wordle from './wordle';
 	import * as Realm from "realm-web";
 	
@@ -31,6 +32,7 @@
 		const placeholder = words.length > 0 ? 
 			words[words.length - 1].map(l => l.color === Wordle.COLOR.correct ? l : {letter: '?'}) :
 			[{letter: '?'}, {letter: '?'}, {letter: '?'}, {letter: '?'}, {letter: '?'}];
+		placeholder.ph = true;
 		words = [...words, placeholder];
 		const agg = w.agg();
 		console.log(agg);
@@ -45,6 +47,10 @@
 			noword = true;
 		}
 	}
+
+	function assembleWord(word) {
+		return word.map(({letter}) => letter).join('');
+	}
 </script>
 
 <main>
@@ -58,6 +64,9 @@
 						<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 					{/each}
 				</div>
+				{#if !word.ph && i === words.length - 1}
+					<Definition word={assembleWord(word)}></Definition>
+				{/if}
 				<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
 			</div>
 		{/each}
@@ -84,9 +93,9 @@
 	.entry {
 		margin-top: 10px;
 		display: flex;
-		align-items: flex-end;
+		align-items: center;
 		justify-content: center;
-		flex-wrap: wrap;
+		flex-direction: column;
 	}
 	.word {
 		display: flex;
