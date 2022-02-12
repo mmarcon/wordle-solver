@@ -55,8 +55,12 @@
 	function changeStartWord() {
 		const newStartWord = prompt('What word should we start with?', assembleWord(words[0]));
 		if(newStartWord) {
-			words = [newStartWord.toLowerCase().split('').map(letter => ({letter}))];
-			w.reset();
+			if(newStartWord.length === 5) {
+				words = [newStartWord.toLowerCase().split('').map(letter => ({letter}))];
+				w.reset();
+				return;
+			}
+			alert('The word must have exactly 5 characters.')
 		}
 	}
 
