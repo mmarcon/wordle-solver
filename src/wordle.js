@@ -74,4 +74,8 @@ export default class Wordle {
   pushRow (sequence) {
     this.schema.push(sequence);
   }
+
+  reset() {
+    this.schema = [];
+  }
 }
