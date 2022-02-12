@@ -23,10 +23,6 @@
 
 <style>
   .letter-wrapper {
-    --color-absent: #3a3a3c;
-    --color-correct: #538d4e;
-    --color-present: #b59f3b;
-    --color-undefined: transparent;
     display: inline-flex;
     flex-direction: column;
     margin: 0 3px;
@@ -37,11 +33,10 @@
     height: 62px;
 		background-color: var(--letter-color);
     border: 1px solid #3a3a3c;
-    color: #d7dadc;
+    color: var(--color-text-normal);
     font-size: 32px;
     line-height: 32px;
     font-weight: 700;
-    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
     display: inline-flex;
     justify-content: center;
     vertical-align: middle;
@@ -51,11 +46,9 @@
     margin-bottom: 5px;
     text-transform: uppercase;
 	}
-
   .color-selector {
     display: flex;
   }
-
   .color-selector button {
     width: 20px;
     height: 20px;
@@ -64,9 +57,9 @@
     padding: 0;
     cursor: pointer;
   }
-
   .color-selector button:disabled {
     opacity: 0.3;
+    cursor: default;
   }
 
   @media only screen and (max-width: 768px) {
@@ -74,28 +67,22 @@
       display: flex;
       flex-direction: column;
     }
-
     .color-selector button {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       margin: 3px 0;
     }
-
     .color-selector button:disabled {
       display: none;
     }
   }
-
-
   .color-selector .absent{
     background-color: var(--color-absent);
   }
-
   .color-selector .present{
     background-color: var(--color-present);
   }
-
   .color-selector .correct{
     background-color: var(--color-correct);
   }

@@ -13,4 +13,4 @@
 
 ### Design
 
- * "Next Word" should go at the bottom always, or be some sort of overlay
+ * ~"Next Word" should go at the bottom always, or be some sort of overlay~

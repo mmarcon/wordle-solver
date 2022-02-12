@@ -35,13 +35,13 @@
 		placeholder.ph = true;
 		words = [...words, placeholder];
 		const agg = w.agg();
-		console.log(agg);
 		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
 		const dictionary = mongodb.db('wordle_solver').collection('dictionary');
 		try {
 			const [{word}] = await dictionary.aggregate(agg);
 			words.pop();
 			words = [...words, word.split('').map((letter, p) => ({letter, color: placeholder[p].color}))];
+			nextDisabled = !nextEnabled();
 			return words;
 		} catch {
 			noword = true;
@@ -61,13 +61,15 @@
 			<div class="entry">
 				<div class="word">
 					{#each word as l, position}
-						<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
+						<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1 || noword} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
 					{/each}
 				</div>
-				{#if !word.ph && i === words.length - 1}
+				{#if i === words.length - 1 && !noword}
+					{#if !word.ph && i === words.length - 1}
 					<Definition word={assembleWord(word)}></Definition>
+					{/if}
+					<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
 				{/if}
-				<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
 			</div>
 		{/each}
 	{/await}
@@ -79,6 +81,13 @@
 <style>
 	:global(body) {
 		background-color: #121213;
+		--color-absent: #3a3a3c;
+    --color-correct: #538d4e;
+    --color-present: #b59f3b;
+    --color-undefined: transparent;
+		--color-text-normal: #d7dadc;
+		--color-text-error: #e9667b;
+		font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 	}
 
 	.loader {
@@ -86,7 +95,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		color: #d7dadc;
+		color: var(--color-text-normal);
 		font-weight: 600;
 		font-size: 22px;
 	}
@@ -106,9 +115,9 @@
 	.next {
 		font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 		background-color: transparent;
-		color: #d7dadc;
+		color: var(--color-text-normal);
 		text-transform: uppercase;
-		border: 2px solid #d7dadc;
+		border: 2px solid var(--color-text-normal);
 		font-size: 14px;
 		font-weight: 600;
 		line-height: 20px;
@@ -128,7 +137,7 @@
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		color: #e9667b;
+		color: var(--color-text-error);
 		font-weight: 600;
 		font-size: 22px;
 		text-transform: uppercase;
