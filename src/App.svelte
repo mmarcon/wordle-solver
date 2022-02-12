@@ -11,6 +11,7 @@
 	let words = [];
 	let nextDisabled = true;
 	let noword = false;
+	let fetchingWord = false;
 
 	function colorChanged(position, color) {
 		words[words.length - 1][position].color = Wordle.COLOR[color];
@@ -23,6 +24,7 @@
 	}
 
 	async function getNextWord() {
+		fetchingWord = true;
 		if(words.length > 0) {
 			w.pushRow(words[words.length - 1]);
 		}
@@ -45,6 +47,8 @@
 			return words;
 		} catch {
 			noword = true;
+		} finally {
+			fetchingWord = false;
 		}
 	}
 
@@ -68,7 +72,10 @@
 					{#if !word.ph && i === words.length - 1}
 					<Definition word={assembleWord(word)}></Definition>
 					{/if}
-					<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
+					
+					{#if !fetchingWord}
+						<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
+					{/if}
 				{/if}
 			</div>
 		{/each}
