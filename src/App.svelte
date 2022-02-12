@@ -52,6 +52,13 @@
 		}
 	}
 
+	function changeStartWord() {
+		const newStartWord = prompt('What word should we start with?', assembleWord(words[0]));
+		if(newStartWord) {
+			words = [newStartWord.split('').map(letter => ({letter}))];
+		}
+	}
+
 	function assembleWord(word) {
 		return word.map(({letter}) => letter).join('');
 	}
@@ -72,9 +79,12 @@
 					{#if !word.ph && i === words.length - 1}
 					<Definition word={assembleWord(word)}></Definition>
 					{/if}
-					
+
 					{#if !fetchingWord}
+					<div class="button-bar">
 						<button class="next" on:click|once={getNextWord} disabled={nextDisabled}>Next Word</button>
+						<button class="change" on:click={changeStartWord}><span>or</span> change start word</button>
+					</div>
 					{/if}
 				{/if}
 			</div>
@@ -94,6 +104,7 @@
     --color-undefined: transparent;
 		--color-text-normal: #d7dadc;
 		--color-text-error: #e9667b;
+		--color-text-link: #3b81e9;
 		font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 	}
 
@@ -130,9 +141,24 @@
 		line-height: 20px;
 		padding: 2px 4px;
 		margin: 0 0 0 5px;
-		visibility: hidden;
 		border-radius: 10px;
 		cursor: pointer;
+	}
+
+	.change {
+		font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+		background-color: transparent;
+		border: 2px transparent;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 20px;
+		padding: 2px 4px;
+		cursor: pointer;
+		color: var(--color-text-link);
+		margin: 0 0 0 5px;
+	}
+	.change span {
+		color: var(--color-text-normal);
 	}
 	.next:disabled {
 		opacity: 0.5;
@@ -150,20 +176,17 @@
 		text-transform: uppercase;
 	}
 
+	.button-bar {
+		display: flex;
+	}
 	@media only screen and (max-width: 768px) {
 		.entry {
 			margin-top: 0;
 		}
-		.next {
+		.next, .change {
 			font-size: 16px;
 			line-height: 30px;
 			margin-top: 8px;
-			display: none;
 		}
-	}
-
-	.entry:last-child .next {
-		display: block;
-		visibility: visible;
 	}
 </style>
