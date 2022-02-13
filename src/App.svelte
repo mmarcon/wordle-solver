@@ -55,11 +55,16 @@
 		}
 	}
 
-	function changeStartWord() {
+	async function changeStartWord() {
 		const newStartWord = prompt('What word should we start with?', assembleWord(words[0]));
 		if(newStartWord) {
 			if(newStartWord.length === 5) {
-				words = [newStartWord.toLowerCase().split('').map(letter => ({letter}))];
+				const newStartWordObj = newStartWord.toLowerCase().split('').map(letter => ({letter}));
+				const mongodb = app.currentUser.mongoClient('mongodb-atlas');
+				const dictionary = mongodb.db('wordle_solver').collection('dictionary');
+				const [{count}] = await dictionary.aggregate([{$count: 'count'}]);
+				newStartWordObj.count = count;
+				words = [newStartWordObj];
 				w.reset();
 				return;
 			}
