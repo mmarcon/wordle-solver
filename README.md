@@ -7,7 +7,7 @@
 
 ### Features
 
- * Give the ability to pick the initial word – for when you get stuck during a game
+ * ~Give the ability to pick the initial word – for when you get stuck during a game~
  * ~Definitions: you suck at Wordle but at least you are learning some new words~
  * Analytics
 

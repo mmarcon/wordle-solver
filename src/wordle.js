@@ -1,5 +1,5 @@
 export default class Wordle {
-  
+
   static COLOR = {
     absent: 0,
     present: 1,
@@ -17,14 +17,68 @@ export default class Wordle {
       }
     }
   }, {
-    $sample: {
-      size: 1
+    $facet: {
+      word: [{
+        $sample: {
+          size: 1
+        }
+      }],
+      count: [{
+        $count: 'count'
+      }]
+    }
+  }, {
+    $project: {
+      word: {
+        $arrayElemAt: [
+          '$word',
+          0
+        ]
+      },
+      count: {
+        $arrayElemAt: [
+          '$count',
+          0
+        ]
+      }
+    }
+  }, {
+    $project: {
+      word: '$word.word',
+      count: '$count.count'
     }
   }];
 
   static BASE_AGG = [{
-    $sample: {
-      size: 1
+    $facet: {
+      word: [{
+        $sample: {
+          size: 1
+        }
+      }],
+      count: [{
+        $count: 'count'
+      }]
+    }
+  }, {
+    $project: {
+      word: {
+        $arrayElemAt: [
+          '$word',
+          0
+        ]
+      },
+      count: {
+        $arrayElemAt: [
+          '$count',
+          0
+        ]
+      }
+    }
+  }, {
+    $project: {
+      word: '$word.word',
+      count: '$count.count'
     }
   }];
 
@@ -36,21 +90,35 @@ export default class Wordle {
     }
   }
 
-  constructor () {
+  constructor() {
     this.schema = [];
   }
 
-  agg () {
-    if (this.schema.length === 0) {
-      return Wordle.BASE_AGG;
-    }
-    const regexes = [{ in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }, { in: '', out: '' }];
+  regex() {
+    const regexes = [{
+      in: '',
+      out: ''
+    }, {
+      in: '',
+      out: ''
+    }, {
+      in: '',
+      out: ''
+    }, {
+      in: '',
+      out: ''
+    }, {
+      in: '',
+      out: ''
+    }];
     const and = [];
     for (let col = 0; col < 5; col++) {
       for (const row of this.schema) {
         switch (row[col].color) {
           case Wordle.COLOR.absent:
-            regexes.forEach(r => { r.out += row[col].letter; });
+            regexes.forEach(r => {
+              r.out += row[col].letter;
+            });
             break;
           case Wordle.COLOR.present:
             regexes[col].out += row[col].letter;
@@ -68,10 +136,18 @@ export default class Wordle {
       regex += '&';
     }
     regex += regexes.map(r => r.in ? r.in : `[^${r.out}]`).join('');
-    return Wordle.AGG_WITH_REGEX(regex);
+    return regex;
   }
 
-  pushRow (sequence) {
+  agg() {
+    if (this.schema.length === 0) {
+      return Wordle.BASE_AGG;
+    }
+
+    return Wordle.AGG_WITH_REGEX(this.regex());
+  }
+
+  pushRow(sequence) {
     this.schema.push(sequence);
   }
 

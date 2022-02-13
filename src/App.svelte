@@ -40,9 +40,12 @@
 		const mongodb = app.currentUser.mongoClient('mongodb-atlas');
 		const dictionary = mongodb.db('wordle_solver').collection('dictionary');
 		try {
-			const [{word}] = await dictionary.aggregate(agg);
+			const [{word, count}] = await dictionary.aggregate(agg);
+			// Get rid of placeholder
 			words.pop();
-			words = [...words, word.split('').map((letter, p) => ({letter, color: placeholder[p].color}))];
+			const nextWordObj = word.split('').map((letter, p) => ({letter, color: placeholder[p].color}));
+			nextWordObj.count = count;
+			words = [...words, nextWordObj];
 			nextDisabled = !nextEnabled();
 			return words;
 		} catch {
@@ -76,9 +79,16 @@
 		{#each words as word, i}
 			<div class="entry">
 				<div class="word">
-					{#each word as l, position}
-						<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1 || noword} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
-					{/each}
+					<div class="letters">
+						{#each word as l, position}
+							<Letter letter={l.letter} color={Wordle.color(l.color)} frozen={i < words.length - 1 || noword} on:colorchange={(event) => colorChanged(position, event.detail.color)}></Letter>
+						{/each}
+					</div>
+					{#if word.count && i === words.length - 1}
+						<div class="count">
+							<progress max={words[0].count} value={words[0].count - word.count} title="Selected out of {word.count} words"></progress>
+						</div>
+					{/if}
 				</div>
 				{#if i === words.length - 1 && !noword}
 					{#if !word.ph && i === words.length - 1}
@@ -113,6 +123,10 @@
 		font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 	}
 
+	main {
+		padding-top: 12px;
+	}
+
 	.loader {
 		margin-top: 10px;
 		display: flex;
@@ -133,6 +147,29 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex-direction: column;
+	}
+	.letters {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.count progress {
+    height: 6px;
+    appearance: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		width: 100%;
+	}
+
+	.count progress::-webkit-progress-bar {
+		background-color: var(--color-text-normal);
+	}
+	.count progress::-webkit-progress-value {
+		background-color: var(--color-correct);
 	}
 
 	.next {
