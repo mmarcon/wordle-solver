@@ -157,6 +157,7 @@
 
 	.count progress {
     height: 6px;
+		-webkit-appearance: none;
     appearance: none;
 		position: absolute;
 		top: 0;
